@@ -1,0 +1,39 @@
+
+spring:
+  application:
+    name: pet-adopt
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/pet_adopt?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+
+  sql:
+    init:
+      mode: never
+
+server:
+  port: 9000
+
+jwt:
+  secret: PetAdopt2024SecretKeyForJWTTokenGenerationMustBeLongEnough
+  expiration: 86400000
+
+logging:
+  level:
+    com.petadopt: debug
+    org.springframework.security: debug
