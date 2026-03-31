@@ -1,0 +1,40 @@
+/* Font Definitions - 本地化字体配置 */
+/*
+  注意：由于 Google Fonts 需要特定的认证才能下载 woff2 文件，
+  这里使用 CDN 链接。如果需要完全离线，请手动下载字体文件并放置到 fonts/ 目录。
+  可以使用 fontello 或 icomoon 等工具生成图标字体。
+
+  下载地址：https://fonts.google.com/download?family=Inter
+  下载地址：https://fonts.google.com/download?family=Plus+Jakarta+Sans
+  下载地址：https://fonts.google.com/download?family=Material+Symbols+Outlined
+*/
+
+/* 本地字体配置示例 - 当你下载字体文件后取消注释
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('fonts/PlusJakartaSans-Variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/Inter-Variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url('fonts/MaterialSymbolsOutlined-Regular.woff2') format('woff2');
+}
+*/
+
+/* 当前使用 Google Fonts CDN */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
