@@ -6,7 +6,7 @@
 
 ### 后端
 - **框架**: Spring Boot 3.2.0
-- **语言**: Java 17
+- **语言**: Java 21
 - **数据库**: MySQL
 - **认证**: JWT (jjwt 0.12.3)
 - **安全**: Spring Security
@@ -100,7 +100,7 @@ python -m http.server 8081
 npx serve .
 ```
 
-前端默认运行在 `http://localhost:8081`
+前端默认运行在 `http://localhost:9000`
 
 ## API 端点
 
