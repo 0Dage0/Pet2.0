@@ -1,7 +1,7 @@
 {
   "name": "pet2.0",
   "version": "1.0.0",
-  "description": "",
+  "description": "一个宠物领养平台Web应用，支持用户浏览宠物、收藏、申请领养、消息咨询等功能。",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,5 +12,14 @@
   "type": "commonjs",
   "dependencies": {
     "pptxgenjs": "^4.0.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0Dage0/Pet2.0.git"
+  },
+  "bugs": {
+    "url": "https://github.com/0Dage0/Pet2.0/issues"
+  },
+  "homepage": "https://github.com/0Dage0/Pet2.0#readme"
 }

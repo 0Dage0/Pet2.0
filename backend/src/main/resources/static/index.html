@@ -133,7 +133,7 @@
 
 <body class="bg-surface font-body text-on-surface antialiased">
   <!-- Top Navigation Bar -->
-  <nav class="sticky top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm">
     <div class="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
       <div
         class="text-2xl font-bold tracking-tighter text-blue-700 flex items-center gap-2 font-headline cursor-pointer"
@@ -152,17 +152,35 @@
           onclick="showPage('about')">关于我们</a>
       </div>
       <div class="flex items-center gap-4">
+        <div id="nav-user-section" class="hidden">
+          <div class="flex items-center gap-3 cursor-pointer" onclick="toggleUserMenu()">
+            <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold" id="user-avatar">U</div>
+            <span class="font-headline font-medium text-slate-700" id="user-name">用户</span>
+            <span class="material-symbols-outlined text-slate-500">expand_more</span>
+          </div>
+          <div id="user-dropdown" class="hidden absolute right-6 top-16 bg-white rounded-xl shadow-lg border border-outline-variant/30 py-2 min-w-40">
+            <a class="block px-4 py-2 text-slate-600 hover:bg-surface-container transition-colors cursor-pointer" onclick="showPage('my')">我的资料</a>
+            <a class="block px-4 py-2 text-slate-600 hover:bg-surface-container transition-colors cursor-pointer" onclick="showPage('favorites')">我的收藏</a>
+            <div class="border-t border-outline-variant/30 my-1"></div>
+            <a class="block px-4 py-2 text-red-500 hover:bg-surface-container transition-colors cursor-pointer" onclick="logout()">退出登录</a>
+          </div>
+        </div>
         <button
+          class="bg-surface-container-lowest text-primary px-6 py-2.5 rounded-xl font-headline font-semibold border border-outline-variant/30 hover:bg-surface-container transition-all cursor-pointer"
+          onclick="showPage('publish')">
+          发布领养
+        </button>
+        <button id="nav-login-btn"
           class="bg-gradient-to-r from-primary to-primary-container text-white px-8 py-2.5 rounded-xl font-headline font-semibold shadow-md active:scale-95 duration-150 cursor-pointer"
-          onclick="showPage('apply')">
-          立即领养
+          onclick="showLoginModal()">
+          登录
         </button>
       </div>
     </div>
   </nav>
 
   <!-- PAGE 1: 首页 -->
-  <main id="page-home" class="page active">
+  <main id="page-home" class="page active pt-16">
     <!-- Hero Section -->
     <section class="relative px-6 py-12 md:py-24 max-w-7xl mx-auto overflow-hidden">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -192,8 +210,7 @@
         <div class="relative order-1 lg:order-2">
           <div
             class="aspect-[4/5] rounded-xl overflow-hidden shadow-2xl relative transform rotate-2 lg:rotate-3 translate-x-4 lg:translate-x-8">
-            <img id="hero-pet-image" alt="人拥抱快乐的狗" class="w-full h-full object-cover"
-              src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800" />
+            <img id="hero-pet-image" alt="人拥抱快乐的狗" class="w-full h-full object-cover"/>
             <div
               class="absolute bottom-6 left-6 right-6 backdrop-blur-xl bg-white/70 p-6 rounded-xl border border-white/50">
               <div class="flex items-center gap-4">
@@ -226,7 +243,8 @@
             class="text-primary font-bold font-headline flex items-center gap-2 transition-all cursor-pointer group"
             onclick="showPage('browse')">
             <span class="group-hover:underline decoration-2 underline-offset-4">查看全部 120+ 只宠物</span>
-            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="east">east</span>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform"
+              data-icon="east">east</span>
           </button>
         </div>
         <div id="featured-pets-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -291,7 +309,7 @@
   </main>
 
   <!-- PAGE 2: 浏览宠物 -->
-  <main id="page-browse" class="page">
+  <main id="page-browse" class="page pt-16">
     <div class="max-w-7xl mx-auto px-6 py-12">
       <!-- Hero Editorial Section -->
       <section class="mb-16">
@@ -314,60 +332,73 @@
       <section class="mb-12 sticky top-24 z-40">
         <div
           class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant/10 flex flex-wrap lg:flex-nowrap gap-4 items-center">
-          <div class="flex-grow flex items-center bg-surface-container-low px-6 py-3 rounded-xl">
-            <span class="material-symbols-outlined text-primary mr-3" data-icon="search">search</span>
+          <div class="flex items-center bg-surface-container-low px-6 py-3 rounded-xl flex-grow">
+            <span class="material-symbols-outlined text-primary mr-3 flex-shrink-0" data-icon="search">search</span>
             <input
               class="bg-transparent border-none focus:ring-0 w-full text-on-surface font-medium placeholder:text-outline/50"
               placeholder="按名字、品种或性格搜索..." type="text" />
           </div>
           <div class="flex flex-wrap items-center gap-3">
+            <!-- 宠物类型下拉菜单 -->
             <div class="relative group">
-              <select
-                class="appearance-none bg-surface-container-low border-none rounded-xl px-6 py-3 pr-10 text-sm font-semibold text-on-surface-variant focus:ring-2 focus:ring-primary/20 cursor-pointer">
-                <option>宠物类型</option>
-                <option>狗狗</option>
-                <option>猫咪</option>
-                <option>兔子</option>
-              </select>
-
+              <button id="species-btn"
+                class="bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold text-on-surface-variant flex items-center justify-between gap-2 hover:bg-surface-container transition-colors w-28">
+                <span id="species-text" class="whitespace-nowrap">宠物类型</span>
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+              </button>
+              <!-- 鼠标经过显示下拉 -->
+              <div class="absolute top-full left-0 mt-1 bg-surface-container-low rounded-xl shadow-lg overflow-hidden z-50 min-w-32 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <button onclick="filterBySpecies('')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">全部</button>
+                <button onclick="filterBySpecies('dog')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">狗狗</button>
+                <button onclick="filterBySpecies('cat')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">猫咪</button>
+                <button onclick="filterBySpecies('rabbit')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">兔子</button>
+              </div>
             </div>
+            <!-- 年龄范围下拉菜单 -->
             <div class="relative group">
-              <select
-                class="appearance-none bg-surface-container-low border-none rounded-xl px-6 py-3 pr-10 text-sm font-semibold text-on-surface-variant focus:ring-2 focus:ring-primary/20 cursor-pointer">
-                <option>年龄范围</option>
-                <option>幼年</option>
-                <option>成年</option>
-                <option>老年</option>
-              </select>
-
+              <button id="age-btn"
+                class="bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold text-on-surface-variant flex items-center justify-between gap-2 hover:bg-surface-container transition-colors w-28">
+                <span id="age-text" class="whitespace-nowrap">年龄范围</span>
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+              </button>
+              <!-- 鼠标经过显示下拉 -->
+              <div class="absolute top-full left-0 mt-1 bg-surface-container-low rounded-xl shadow-lg overflow-hidden z-50 min-w-32 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <button onclick="filterByAge('')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">全部</button>
+                <button onclick="filterByAge('puppy')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">幼年</button>
+                <button onclick="filterByAge('adult')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">成年</button>
+                <button onclick="filterByAge('senior')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">老年</button>
+              </div>
             </div>
+            <!-- 品种下拉菜单 -->
             <div class="relative group">
-              <select
-                class="appearance-none bg-surface-container-low border-none rounded-xl px-6 py-3 pr-10 text-sm font-semibold text-on-surface-variant focus:ring-2 focus:ring-primary/20 cursor-pointer">
-                <option>品种</option>
-                <option>金毛寻回犬</option>
-                <option>缅因猫</option>
-                <option>荷兰垂耳兔</option>
-              </select>
+              <button id="breed-btn"
+                class="bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold text-on-surface-variant flex items-center justify-between gap-2 hover:bg-surface-container transition-colors w-28">
+                <span id="breed-text" class="whitespace-nowrap">品种</span>
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+              </button>
+              <!-- 鼠标经过显示下拉 -->
+              <div class="absolute top-full left-0 mt-1 bg-surface-container-low rounded-xl shadow-lg overflow-hidden z-50 min-w-40 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <button onclick="filterByBreed('')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">全部</button>
+                <button onclick="filterByBreed('Golden Retriever')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">金毛寻回犬</button>
+                <button onclick="filterByBreed('Persian')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">波斯猫</button>
+                <button onclick="filterByBreed('Labrador')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">拉布拉多</button>
+              </div>
             </div>
-            <button class="bg-primary text-white p-3 rounded-xl hover:bg-primary-container transition-colors">
-              <span class="material-symbols-outlined" data-icon="tune">tune</span>
-            </button>
           </div>
         </div>
       </section>
 
       <!-- Selection Chips -->
       <div class="flex gap-3 mb-12 overflow-x-auto hide-scrollbar pb-2">
-        <button class="bg-primary text-white px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap">全部</button>
-        <button
-          class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-surface-variant transition-colors">新到成员</button>
-        <button
-          class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-surface-variant transition-colors">亲密伙伴</button>
-        <button
-          class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-surface-variant transition-colors">特殊关爱</button>
-        <button
-          class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-surface-variant transition-colors">待领养</button>
+        <button onclick="filterByCategory('all')" class="category-btn bg-primary text-white px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap">全部</button>
+        <button onclick="filterByCategory('new')"
+          class="category-btn bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-surface-variant transition-colors">新到成员</button>
+        <button onclick="filterByCategory('companion')"
+          class="category-btn bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-surface-variant transition-colors">亲密伙伴</button>
+        <button onclick="filterByCategory('special')"
+          class="category-btn bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-surface-variant transition-colors">特殊关爱</button>
+        <button onclick="filterByCategory('adoptable')"
+          class="category-btn bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-surface-variant transition-colors">待领养</button>
       </div>
 
       <!-- Pet Grid -->
@@ -377,18 +408,21 @@
 
       <!-- Pagination -->
       <div class="mt-20 flex justify-center">
-        <button
-          class="group flex items-center gap-4 bg-surface-container-lowest border-2 border-primary/10 px-10 py-4 rounded-full font-headline font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm cursor-pointer">
-          <span>加载更多伙伴</span>
-          <span class="material-symbols-outlined group-hover:translate-y-1 transition-transform"
-            data-icon="expand_more">expand_more</span>
-        </button>
+        <div id="toggle-btn-container">
+          <button
+            class="group flex items-center gap-4 bg-surface-container-lowest border-2 border-primary/10 px-10 py-4 rounded-full font-headline font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm cursor-pointer"
+            onclick="togglePets()">
+            <span>加载更多伙伴</span>
+            <span class="material-symbols-outlined group-hover:translate-y-1 transition-transform"
+              data-icon="expand_more">expand_more</span>
+          </button>
+        </div>
       </div>
     </div>
   </main>
 
   <!-- PAGE 3: 宠物详情 -->
-  <main id="page-detail" class="page">
+  <main id="page-detail" class="page pt-16">
     <div class="max-w-7xl mx-auto px-6 py-12">
       <!-- Back Action -->
       <div class="mb-8">
@@ -422,7 +456,7 @@
           <div class="grid grid-cols-2 gap-6">
             <img id="detail-gallery-image" alt="Pet Gallery"
               class="w-full h-64 object-cover rounded-xl grayscale hover:grayscale-0 transition-all duration-500"
-              src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=600" />
+              src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=800" />
             <div
               class="bg-surface-container-low rounded-xl flex items-center justify-center p-8 text-center border-2 border-dashed border-outline-variant/30">
               <p class="text-on-surface-variant font-medium">查看 Luna 在庇护所的日常漫步 <br />
@@ -513,34 +547,43 @@
   </main>
 
   <!-- PAGE 4: 领养申请 -->
-  <main id="page-apply" class="page">
+  <main id="page-apply" class="page pt-16">
     <div class="max-w-4xl mx-auto px-6 py-12 md:py-20">
       <!-- Header & Progress Section -->
       <header class="text-center mb-12">
         <span class="text-primary font-headline font-bold uppercase tracking-widest text-xs mb-4 block">申请流程</span>
         <h1 class="text-4xl md:text-5xl font-headline font-extrabold text-on-surface tracking-tight mb-6">开启它的回家之路</h1>
-        <p id="apply-pet-name-title" class="text-on-surface-variant max-w-xl mx-auto text-lg leading-relaxed">为 <strong id="apply-pet-name-inline" class="text-primary">--</strong> 提交领养申请</p>
+        <p id="apply-pet-name-title" class="text-on-surface-variant max-w-xl mx-auto text-lg leading-relaxed">为 <strong
+            id="apply-pet-name-inline" class="text-primary">--</strong> 提交领养申请</p>
       </header>
 
       <!-- Stepper -->
       <div class="mb-12 relative">
         <div class="flex justify-between items-center w-full">
           <div id="stepper-1" class="flex flex-col items-center gap-3 relative z-10 group">
-            <div id="stepper-1-circle" class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-headline font-bold shadow-lg shadow-primary/20">1</div>
+            <div id="stepper-1-circle"
+              class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-headline font-bold shadow-lg shadow-primary/20">
+              1</div>
             <span id="stepper-1-label" class="text-primary font-headline font-bold text-sm">联系信息</span>
           </div>
           <div id="connector-1" class="flex-1 h-0.5 bg-outline-variant mx-4 -mt-8 relative overflow-hidden">
-            <div id="connector-1-fill" class="absolute inset-0 bg-primary transition-all duration-500" style="width: 0%"></div>
+            <div id="connector-1-fill" class="absolute inset-0 bg-primary transition-all duration-500"
+              style="width: 0%"></div>
           </div>
           <div id="stepper-2" class="flex flex-col items-center gap-3 relative z-10 group">
-            <div id="stepper-2-circle" class="w-12 h-12 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-headline font-bold">2</div>
+            <div id="stepper-2-circle"
+              class="w-12 h-12 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-headline font-bold">
+              2</div>
             <span id="stepper-2-label" class="text-on-surface-variant font-headline font-medium text-sm">家庭环境</span>
           </div>
           <div id="connector-2" class="flex-1 h-0.5 bg-outline-variant mx-4 -mt-8 relative overflow-hidden">
-            <div id="connector-2-fill" class="absolute inset-0 bg-primary transition-all duration-500" style="width: 0%"></div>
+            <div id="connector-2-fill" class="absolute inset-0 bg-primary transition-all duration-500"
+              style="width: 0%"></div>
           </div>
           <div id="stepper-3" class="flex flex-col items-center gap-3 relative z-10 group">
-            <div id="stepper-3-circle" class="w-12 h-12 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-headline font-bold">3</div>
+            <div id="stepper-3-circle"
+              class="w-12 h-12 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-headline font-bold">
+              3</div>
             <span id="stepper-3-label" class="text-on-surface-variant font-headline font-medium text-sm">推荐人</span>
           </div>
         </div>
@@ -556,24 +599,37 @@
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
             <div class="flex flex-col gap-2">
-              <label class="text-sm font-headline font-bold text-on-surface px-1">姓名 <span class="text-error">*</span></label>
-              <input id="apply-name" class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60" placeholder="例如：王小明" type="text" />
+              <label class="text-sm font-headline font-bold text-on-surface px-1">姓名 <span
+                  class="text-error">*</span></label>
+              <input id="apply-name"
+                class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60"
+                placeholder="例如：王小明" type="text" />
             </div>
             <div class="flex flex-col gap-2">
-              <label class="text-sm font-headline font-bold text-on-surface px-1">电子邮箱 <span class="text-error">*</span></label>
-              <input id="apply-email" class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60" placeholder="xiaoming@example.com" type="email" />
+              <label class="text-sm font-headline font-bold text-on-surface px-1">电子邮箱 <span
+                  class="text-error">*</span></label>
+              <input id="apply-email"
+                class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60"
+                placeholder="xiaoming@example.com" type="email" />
             </div>
             <div class="flex flex-col gap-2">
-              <label class="text-sm font-headline font-bold text-on-surface px-1">手机号码 <span class="text-error">*</span></label>
-              <input id="apply-phone" class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60" placeholder="138-0000-0000" type="tel" />
+              <label class="text-sm font-headline font-bold text-on-surface px-1">手机号码 <span
+                  class="text-error">*</span></label>
+              <input id="apply-phone"
+                class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60"
+                placeholder="138-0000-0000" type="tel" />
             </div>
             <div class="flex flex-col gap-2">
-              <label class="text-sm font-headline font-bold text-on-surface px-1">所在城市 <span class="text-error">*</span></label>
-              <input id="apply-city" class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60" placeholder="上海市" type="text" />
+              <label class="text-sm font-headline font-bold text-on-surface px-1">所在城市 <span
+                  class="text-error">*</span></label>
+              <input id="apply-city"
+                class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60"
+                placeholder="上海市" type="text" />
             </div>
           </div>
           <div class="flex justify-end mt-10">
-            <button onclick="applyNextStep(2)" class="bg-gradient-to-r from-primary to-primary-container text-white px-10 py-4 rounded-xl font-headline font-bold text-lg shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2">
+            <button onclick="applyNextStep(2)"
+              class="bg-gradient-to-r from-primary to-primary-container text-white px-10 py-4 rounded-xl font-headline font-bold text-lg shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2">
               下一步：家庭环境
               <span class="material-symbols-outlined">arrow_forward</span>
             </button>
@@ -588,54 +644,66 @@
           </div>
           <div class="space-y-8">
             <div class="flex flex-col gap-2">
-              <label class="text-sm font-headline font-bold text-on-surface px-1">您的居住类型是什么？ <span class="text-error">*</span></label>
+              <label class="text-sm font-headline font-bold text-on-surface px-1">您的居住类型是什么？ <span
+                  class="text-error">*</span></label>
               <div class="flex flex-wrap gap-4 mt-2">
                 <label class="residence-option cursor-pointer">
                   <input type="radio" name="residenceType" value="house" class="hidden peer" />
-                  <span class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">别墅/独栋</span>
+                  <span
+                    class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">别墅/独栋</span>
                 </label>
                 <label class="residence-option cursor-pointer">
                   <input type="radio" name="residenceType" value="apartment" class="hidden peer" />
-                  <span class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">公寓</span>
+                  <span
+                    class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">公寓</span>
                 </label>
                 <label class="residence-option cursor-pointer">
                   <input type="radio" name="residenceType" value="other" class="hidden peer" />
-                  <span class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">其他</span>
+                  <span
+                    class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">其他</span>
                 </label>
               </div>
             </div>
             <div class="flex flex-col gap-2">
-              <label class="text-sm font-headline font-bold text-on-surface px-1">是否有院子？ <span class="text-error">*</span></label>
+              <label class="text-sm font-headline font-bold text-on-surface px-1">是否有院子？ <span
+                  class="text-error">*</span></label>
               <div class="flex flex-wrap gap-4 mt-2">
                 <label class="cursor-pointer">
                   <input type="radio" name="hasYard" value="true" class="hidden peer" />
-                  <span class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">有</span>
+                  <span
+                    class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">有</span>
                 </label>
                 <label class="cursor-pointer">
                   <input type="radio" name="hasYard" value="false" class="hidden peer" />
-                  <span class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">没有</span>
+                  <span
+                    class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">没有</span>
                 </label>
               </div>
             </div>
             <div class="flex flex-col gap-2">
-              <label class="text-sm font-headline font-bold text-on-surface px-1">家中是否有其他宠物？ <span class="text-error">*</span></label>
+              <label class="text-sm font-headline font-bold text-on-surface px-1">家中是否有其他宠物？ <span
+                  class="text-error">*</span></label>
               <div class="flex flex-wrap gap-4 mt-2">
                 <label class="cursor-pointer">
                   <input type="radio" name="hasOtherPets" value="true" class="hidden peer" />
-                  <span class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">有</span>
+                  <span
+                    class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">有</span>
                 </label>
                 <label class="cursor-pointer">
                   <input type="radio" name="hasOtherPets" value="false" class="hidden peer" />
-                  <span class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">没有</span>
+                  <span
+                    class="bg-surface-container-low px-6 py-3 rounded-full text-sm font-headline font-semibold peer-checked:bg-primary peer-checked:text-white transition-all block">没有</span>
                 </label>
               </div>
             </div>
           </div>
           <div class="flex justify-between mt-10">
-            <button onclick="applyPrevStep(1)" class="text-primary font-headline font-bold hover:text-primary-container transition-colors px-6 py-2 flex items-center gap-2">
+            <button onclick="applyPrevStep(1)"
+              class="text-primary font-headline font-bold hover:text-primary-container transition-colors px-6 py-2 flex items-center gap-2">
               <span class="material-symbols-outlined">arrow_back</span> 上一步
             </button>
-            <button onclick="applyNextStep(3)" class="bg-gradient-to-r from-primary to-primary-container text-white px-10 py-4 rounded-xl font-headline font-bold text-lg shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2">
+            <button onclick="applyNextStep(3)"
+              class="bg-gradient-to-r from-primary to-primary-container text-white px-10 py-4 rounded-xl font-headline font-bold text-lg shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2">
               下一步：推荐人
               <span class="material-symbols-outlined">arrow_forward</span>
             </button>
@@ -651,11 +719,15 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
             <div class="flex flex-col gap-2">
               <label class="text-sm font-headline font-bold text-on-surface px-1">推荐人姓名</label>
-              <input id="apply-referrer-name" class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60" placeholder="可选" type="text" />
+              <input id="apply-referrer-name"
+                class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60"
+                placeholder="可选" type="text" />
             </div>
             <div class="flex flex-col gap-2">
               <label class="text-sm font-headline font-bold text-on-surface px-1">推荐人电话</label>
-              <input id="apply-referrer-phone" class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60" placeholder="可选" type="tel" />
+              <input id="apply-referrer-phone"
+                class="apply-input bg-surface-container-low border-0 border-b-2 border-transparent focus:border-primary px-4 py-4 rounded-lg transition-all text-on-surface placeholder:text-outline-variant/60"
+                placeholder="可选" type="tel" />
             </div>
           </div>
           <div class="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-100">
@@ -663,7 +735,8 @@
           </div>
           <div class="flex items-start gap-4 mt-8 p-6 bg-primary/5 rounded-2xl border border-primary/10">
             <div class="mt-1">
-              <input class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant cursor-pointer" id="apply-terms" type="checkbox" />
+              <input class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant cursor-pointer"
+                id="apply-terms" type="checkbox" />
             </div>
             <label class="text-sm text-on-surface-variant leading-relaxed cursor-pointer" for="apply-terms">
               我同意 <a class="text-primary font-bold hover:underline" href="#">领养条款</a>
@@ -671,10 +744,12 @@
             </label>
           </div>
           <div class="flex justify-between mt-10">
-            <button onclick="applyPrevStep(2)" class="text-primary font-headline font-bold hover:text-primary-container transition-colors px-6 py-2 flex items-center gap-2">
+            <button onclick="applyPrevStep(2)"
+              class="text-primary font-headline font-bold hover:text-primary-container transition-colors px-6 py-2 flex items-center gap-2">
               <span class="material-symbols-outlined">arrow_back</span> 上一步
             </button>
-            <button id="apply-submit-btn" onclick="applySubmit()" class="bg-gradient-to-r from-primary to-primary-container text-white px-10 py-4 rounded-xl font-headline font-bold text-lg shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center gap-2">
+            <button id="apply-submit-btn" onclick="applySubmit()"
+              class="bg-gradient-to-r from-primary to-primary-container text-white px-10 py-4 rounded-xl font-headline font-bold text-lg shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center gap-2">
               <span class="material-symbols-outlined">check</span> 提交申请
             </button>
           </div>
@@ -683,15 +758,18 @@
         <!-- Success Screen -->
         <div id="form-success" class="form-step hidden text-center py-8">
           <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span class="material-symbols-outlined text-green-600 text-5xl" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+            <span class="material-symbols-outlined text-green-600 text-5xl"
+              style="font-variation-settings: 'FILL' 1;">task_alt</span>
           </div>
           <h2 class="text-3xl font-headline font-extrabold text-on-surface mb-4">申请已提交！</h2>
           <p class="text-on-surface-variant text-lg mb-8 max-w-md mx-auto">您的领养申请已成功提交。工作人员将在 24-48 小时内与您联系，请保持手机畅通。</p>
           <div class="flex justify-center gap-4">
-            <button onclick="showPage('my')" class="bg-primary text-white px-8 py-3 rounded-xl font-headline font-bold hover:bg-primary/90 transition-all">
+            <button onclick="showPage('my')"
+              class="bg-primary text-white px-8 py-3 rounded-xl font-headline font-bold hover:bg-primary/90 transition-all">
               查看申请进度
             </button>
-            <button onclick="showPage('browse')" class="bg-surface-container-low text-primary px-8 py-3 rounded-xl font-headline font-bold hover:bg-surface-container transition-all">
+            <button onclick="showPage('browse')"
+              class="bg-surface-container-low text-primary px-8 py-3 rounded-xl font-headline font-bold hover:bg-surface-container transition-all">
               继续浏览
             </button>
           </div>
@@ -702,14 +780,19 @@
       <aside class="mt-16">
         <div class="bg-surface-container-low rounded-xl p-8 flex flex-col md:flex-row items-center gap-8">
           <div class="relative w-full md:w-48 h-48 flex-shrink-0">
-            <img id="apply-pet-image" alt="Pet" class="w-full h-full object-cover rounded-lg shadow-md" src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400" />
-            <div class="absolute top-2 right-2 bg-white/70 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-primary uppercase tracking-tighter shadow-sm">正在申请</div>
+            <img id="apply-pet-image" alt="Pet" class="w-full h-full object-cover rounded-lg shadow-md"
+              src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800" />
+            <div
+              class="absolute top-2 right-2 bg-white/70 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-primary uppercase tracking-tighter shadow-sm">
+              正在申请</div>
           </div>
           <div class="text-center md:text-left">
-            <h3 id="apply-pet-name" class="text-3xl font-headline font-extrabold text-on-surface tracking-tight mb-2">加载中...</h3>
+            <h3 id="apply-pet-name" class="text-3xl font-headline font-extrabold text-on-surface tracking-tight mb-2">
+              加载中...</h3>
             <p id="apply-pet-quote" class="text-on-surface-variant italic mb-4">"一个等待在您怀里打盹的温柔灵魂。"</p>
             <div id="apply-pet-tags" class="flex flex-wrap justify-center md:justify-start gap-2">
-              <span class="bg-surface-container-highest px-3 py-1 rounded-full text-xs font-bold text-on-surface-variant">--</span>
+              <span
+                class="bg-surface-container-highest px-3 py-1 rounded-full text-xs font-bold text-on-surface-variant">--</span>
             </div>
           </div>
         </div>
@@ -717,21 +800,87 @@
     </div>
   </main>
 
-  <!-- PAGE 6: 关于我们 -->
-  <main id="page-about" class="page">
+  <!-- PAGE 6: 发布领养 -->
+  <main id="page-publish" class="page pt-16">
+    <div class="flex flex-1 pt-8 px-6 max-w-7xl mx-auto w-full gap-8">
+      <div class="flex-1">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-extrabold font-headline mb-4 tracking-tight">发布领养</h2>
+          <p class="text-on-surface-variant max-w-md mx-auto">为流浪宠物寻找温暖的家，填写信息发布领养</p>
+        </div>
+
+        <div class="max-w-2xl mx-auto">
+          <div class="bg-surface-container-low rounded-2xl p-8">
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-700 mb-2">宠物名称</label>
+              <input type="text" id="publish-name" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请输入宠物名称">
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-700 mb-2">物种</label>
+              <select id="publish-species" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                <option value="dog">狗狗</option>
+                <option value="cat">猫咪</option>
+                <option value="rabbit">兔子</option>
+                <option value="bird">鸟类</option>
+              </select>
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-700 mb-2">品种</label>
+              <input type="text" id="publish-breed" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请输入品种">
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-700 mb-2">性别</label>
+              <select id="publish-gender" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                <option value="male">公</option>
+                <option value="female">母</option>
+              </select>
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-700 mb-2">年龄</label>
+              <select id="publish-age" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                <option value="kitten">幼年</option>
+                <option value="young">青年</option>
+                <option value="adult">成年</option>
+                <option value="senior">老年</option>
+              </select>
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-700 mb-2">体重 (kg)</label>
+              <input type="number" id="publish-weight" step="0.1" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请输入体重">
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-700 mb-2">宠物描述</label>
+              <textarea id="publish-description" rows="4" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请描述宠物的性格、习惯等特点"></textarea>
+            </div>
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-700 mb-2">性格特点</label>
+              <input type="text" id="publish-temperament" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="如：友好、活泼、安静">
+            </div>
+            <button onclick="handlePublish()" class="w-full bg-gradient-to-r from-primary to-primary-container text-white py-3 rounded-xl font-headline font-semibold hover:opacity-90 transition-opacity">发布</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- PAGE 7: 我的 -->
+  <main id="page-about" class="page pt-16">
     <div class="flex flex-1 pt-8 px-6 max-w-7xl mx-auto w-full gap-8">
       <!-- Modern Left Rail -->
       <aside class="hidden lg:flex flex-col w-64 h-[calc(100vh-120px)] sticky top-24 gap-2">
         <div class="space-y-1">
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('home')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('home')">
             <span class="material-symbols-outlined text-[22px]">home</span>
             <span class="font-headline text-sm font-medium">首页</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('browse')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('browse')">
             <span class="material-symbols-outlined text-[22px]">search</span>
             <span class="font-headline text-sm font-medium">浏览</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('my')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('my')">
             <span class="material-symbols-outlined text-[22px]">person</span>
             <span class="font-headline text-sm font-medium">我的</span>
           </a>
@@ -743,8 +892,10 @@
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 md:p-10">
           <!-- 页面标题 -->
           <div class="text-center mb-12">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary/70 rounded-2xl shadow-lg mb-6">
-              <span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings: 'FILL' 1;">pets</span>
+            <div
+              class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary/70 rounded-2xl shadow-lg mb-6">
+              <span class="material-symbols-outlined text-white text-4xl"
+                style="font-variation-settings: 'FILL' 1;">pets</span>
             </div>
             <h1 class="text-4xl md:text-5xl font-headline font-extrabold text-on-surface mb-3">关于我们</h1>
             <p class="text-on-surface-variant text-lg max-w-2xl mx-auto">用爱守护每一个生命，搭建流浪动物与温暖家庭之间的桥梁</p>
@@ -754,44 +905,55 @@
           <div class="grid md:grid-cols-2 gap-8 mb-10">
             <div class="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-6">
               <div class="flex items-center gap-3 mb-4">
-                <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                <span class="material-symbols-outlined text-primary text-2xl"
+                  style="font-variation-settings: 'FILL' 1;">favorite</span>
                 <h3 class="text-xl font-headline font-bold text-on-surface">我们的使命</h3>
               </div>
-              <p class="text-on-surface-variant leading-relaxed">我们致力于帮助流浪动物找到永远的家，通过搭建领养平台，连接需要家庭的宠物与愿意给予爱的家庭，让每一个生命都能得到应有的关爱与尊重。</p>
+              <p class="text-on-surface-variant leading-relaxed">
+                我们致力于帮助流浪动物找到永远的家，通过搭建领养平台，连接需要家庭的宠物与愿意给予爱的家庭，让每一个生命都能得到应有的关爱与尊重。</p>
             </div>
             <div class="bg-gradient-to-br from-secondary/5 to-secondary/10 rounded-2xl p-6">
               <div class="flex items-center gap-3 mb-4">
-                <span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings: 'FILL' 1;">visibility</span>
+                <span class="material-symbols-outlined text-secondary text-2xl"
+                  style="font-variation-settings: 'FILL' 1;">visibility</span>
                 <h3 class="text-xl font-headline font-bold text-on-surface">我们的愿景</h3>
               </div>
-              <p class="text-on-surface-variant leading-relaxed">构建一个没有流浪动物的社会，我们希望通过平台的力量，倡导领养代替购买的理念，让每一只动物都能拥有一个温暖的家，让爱与陪伴传递给每一个生命。</p>
+              <p class="text-on-surface-variant leading-relaxed">
+                构建一个没有流浪动物的社会，我们希望通过平台的力量，倡导领养代替购买的理念，让每一只动物都能拥有一个温暖的家，让爱与陪伴传递给每一个生命。</p>
             </div>
           </div>
 
           <!-- 团队介绍 -->
           <div class="mb-10">
             <h2 class="text-2xl font-headline font-bold text-on-surface mb-6 flex items-center gap-3">
-              <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">groups</span>
+              <span class="material-symbols-outlined text-primary"
+                style="font-variation-settings: 'FILL' 1;">groups</span>
               核心团队
             </h2>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div class="text-center p-6 bg-slate-50 rounded-2xl hover:shadow-md transition-shadow">
-                <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-primary/40 rounded-full flex items-center justify-center">
-                  <span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">person</span>
+                <div
+                  class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-primary/40 rounded-full flex items-center justify-center">
+                  <span class="material-symbols-outlined text-4xl text-primary"
+                    style="font-variation-settings: 'FILL' 1;">person</span>
                 </div>
                 <h4 class="font-headline font-bold text-on-surface">创始团队</h4>
                 <p class="text-sm text-on-surface-variant mt-1">创始人</p>
               </div>
               <div class="text-center p-6 bg-slate-50 rounded-2xl hover:shadow-md transition-shadow">
-                <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-secondary/20 to-secondary/40 rounded-full flex items-center justify-center">
-                  <span class="material-symbols-outlined text-4xl text-secondary" style="font-variation-settings: 'FILL' 1;">support_agent</span>
+                <div
+                  class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-secondary/20 to-secondary/40 rounded-full flex items-center justify-center">
+                  <span class="material-symbols-outlined text-4xl text-secondary"
+                    style="font-variation-settings: 'FILL' 1;">support_agent</span>
                 </div>
                 <h4 class="font-headline font-bold text-on-surface">志愿者团队</h4>
                 <p class="text-sm text-on-surface-variant mt-1">爱心志愿者</p>
               </div>
               <div class="text-center p-6 bg-slate-50 rounded-2xl hover:shadow-md transition-shadow">
-                <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-tertiary/20 to-tertiary/40 rounded-full flex items-center justify-center">
-                  <span class="material-symbols-outlined text-4xl text-tertiary" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+                <div
+                  class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-tertiary/20 to-tertiary/40 rounded-full flex items-center justify-center">
+                  <span class="material-symbols-outlined text-4xl text-tertiary"
+                    style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
                 </div>
                 <h4 class="font-headline font-bold text-on-surface">合作机构</h4>
                 <p class="text-sm text-on-surface-variant mt-1">宠物救助组织</p>
@@ -818,7 +980,8 @@
           <!-- 联系方式 -->
           <div class="bg-slate-50 rounded-2xl p-6">
             <h2 class="text-xl font-headline font-bold text-on-surface mb-4 flex items-center gap-3">
-              <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">contact_mail</span>
+              <span class="material-symbols-outlined text-primary"
+                style="font-variation-settings: 'FILL' 1;">contact_mail</span>
               联系我们
             </h2>
             <div class="grid sm:grid-cols-2 gap-4">
@@ -846,35 +1009,41 @@
   </main>
 
   <!-- PAGE 5: 我的 -->
-  <main id="page-my" class="page">
+  <main id="page-my" class="page pt-16">
     <div class="flex flex-1 pt-8 px-6 max-w-7xl mx-auto w-full gap-8">
       <!-- Modern Left Rail -->
       <aside class="hidden lg:flex flex-col w-64 h-[calc(100vh-120px)] sticky top-24 gap-2">
         <div class="space-y-1">
           <a class="bg-primary/5 text-primary rounded-xl px-4 py-3 flex items-center gap-4 transition-all" href="#">
-            <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+            <span class="material-symbols-outlined text-[22px]"
+              style="font-variation-settings: 'FILL' 1;">dashboard</span>
             <span class="font-headline text-sm font-semibold">概览</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('match')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('match')">
             <span class="material-symbols-outlined text-[22px]">pets</span>
             <span class="font-headline text-sm font-medium">匹配</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('messages')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('messages')">
             <span class="material-symbols-outlined text-[22px]">chat_bubble</span>
             <span class="font-headline text-sm font-medium">消息</span>
             <span class="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('favorites')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('favorites')">
             <span class="material-symbols-outlined text-[22px]">favorite</span>
             <span class="font-headline text-sm font-medium">已收藏</span>
           </a>
         </div>
         <div class="mt-auto border-t border-slate-100 pt-6 space-y-1">
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all" href="#">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all"
+            href="#">
             <span class="material-symbols-outlined text-[22px]">settings</span>
             <span class="font-headline text-sm font-medium">设置</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all" href="#">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all"
+            href="#">
             <span class="material-symbols-outlined text-[22px]">help</span>
             <span class="font-headline text-sm font-medium">帮助中心</span>
           </a>
@@ -883,11 +1052,13 @@
           <div class="relative z-10">
             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">会员计划</p>
             <h4 class="font-headline font-bold text-sm mb-3">升级至高级会员</h4>
-            <button class="bg-white text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">
+            <button
+              class="bg-white text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">
               立即升级
             </button>
           </div>
-          <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-8xl transition-transform group-hover:scale-110">stars</span>
+          <span
+            class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-8xl transition-transform group-hover:scale-110">stars</span>
         </div>
       </aside>
       <!-- Main Content Area -->
@@ -916,7 +1087,9 @@
             <h4 class="text-sm font-medium text-white/80">已保存的匹配</h4>
             <p class="text-4xl font-headline font-extrabold mt-1">12</p>
           </div>
-          <button class="relative z-10 w-full py-3 bg-white/20 hover:bg-white/30 backdrop-blur rounded-xl font-bold text-sm transition-colors" onclick="showPage('browse')">
+          <button
+            class="relative z-10 w-full py-3 bg-white/20 hover:bg-white/30 backdrop-blur rounded-xl font-bold text-sm transition-colors"
+            onclick="showPage('browse')">
             继续浏览
           </button>
           <!-- Background graphic -->
@@ -927,10 +1100,12 @@
           <div class="flex justify-between items-center mb-6">
             <h3 class="font-headline font-bold text-xl text-slate-900">最近浏览的宠物</h3>
             <div class="flex gap-2">
-              <button class="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-400 transition-colors">
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-400 transition-colors">
                 <span class="material-symbols-outlined text-sm">chevron_left</span>
               </button>
-              <button class="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-400 transition-colors">
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-400 transition-colors">
                 <span class="material-symbols-outlined text-sm">chevron_right</span>
               </button>
             </div>
@@ -939,8 +1114,11 @@
             <!-- Pet Card 1 -->
             <div class="group cursor-pointer" onclick="showPage('detail')">
               <div class="aspect-[4/5] rounded-2xl overflow-hidden mb-3 relative">
-                <img alt="Pet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=400"/>
-                <button class="absolute top-3 right-3 w-8 h-8 bg-white/80 glass-blur rounded-full flex items-center justify-center text-slate-900 hover:text-primary transition-colors">
+                <img alt="Pet"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=800" />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 bg-white/80 glass-blur rounded-full flex items-center justify-center text-slate-900 hover:text-primary transition-colors">
                   <span class="material-symbols-outlined text-sm">favorite</span>
                 </button>
               </div>
@@ -950,9 +1128,13 @@
             <!-- Pet Card 2 -->
             <div class="group cursor-pointer" onclick="showPage('detail')">
               <div class="aspect-[4/5] rounded-2xl overflow-hidden mb-3 relative">
-                <img alt="Pet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400"/>
-                <button class="absolute top-3 right-3 w-8 h-8 bg-white/80 glass-blur rounded-full flex items-center justify-center text-primary">
-                  <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                <img alt="Pet"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800" />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 bg-white/80 glass-blur rounded-full flex items-center justify-center text-primary">
+                  <span class="material-symbols-outlined text-sm"
+                    style="font-variation-settings: 'FILL' 1;">favorite</span>
                 </button>
               </div>
               <h4 class="font-bold text-slate-900 group-hover:text-primary transition-colors">露西</h4>
@@ -961,8 +1143,11 @@
             <!-- Pet Card 3 -->
             <div class="group cursor-pointer" onclick="showPage('detail')">
               <div class="aspect-[4/5] rounded-2xl overflow-hidden mb-3 relative">
-                <img alt="Pet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400"/>
-                <button class="absolute top-3 right-3 w-8 h-8 bg-white/80 glass-blur rounded-full flex items-center justify-center text-slate-900 hover:text-primary transition-colors">
+                <img alt="Pet"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=800" />
+                <button
+                  class="absolute top-3 right-3 w-8 h-8 bg-white/80 glass-blur rounded-full flex items-center justify-center text-slate-900 hover:text-primary transition-colors">
                   <span class="material-symbols-outlined text-sm">favorite</span>
                 </button>
               </div>
@@ -971,7 +1156,8 @@
             </div>
             <!-- Pet Card 4 -->
             <div class="group cursor-pointer" onclick="showPage('browse')">
-              <div class="aspect-[4/5] rounded-2xl overflow-hidden mb-3 relative bg-slate-100 flex items-center justify-center border border-dashed border-slate-300">
+              <div
+                class="aspect-[4/5] rounded-2xl overflow-hidden mb-3 relative bg-slate-100 flex items-center justify-center border border-dashed border-slate-300">
                 <div class="text-center">
                   <span class="material-symbols-outlined text-slate-400 text-3xl">add</span>
                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">发现更多</p>
@@ -987,34 +1173,40 @@
   </main>
 
   <!-- PAGE: 匹配 -->
-  <main id="page-match" class="page">
+  <main id="page-match" class="page pt-16">
     <div class="flex flex-1 pt-8 px-6 max-w-7xl mx-auto w-full gap-8">
       <aside class="hidden lg:flex flex-col w-64 h-[calc(100vh-120px)] sticky top-24 gap-2">
         <div class="space-y-1">
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('my')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('my')">
             <span class="material-symbols-outlined text-[22px]">dashboard</span>
             <span class="font-headline text-sm font-medium">概览</span>
           </a>
-          <a class="bg-primary/5 text-primary rounded-xl px-4 py-3 flex items-center gap-4 transition-all cursor-pointer" onclick="showPage('match')">
+          <a class="bg-primary/5 text-primary rounded-xl px-4 py-3 flex items-center gap-4 transition-all cursor-pointer"
+            onclick="showPage('match')">
             <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">pets</span>
             <span class="font-headline text-sm font-semibold">匹配</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('messages')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('messages')">
             <span class="material-symbols-outlined text-[22px]">chat_bubble</span>
             <span class="font-headline text-sm font-medium">消息</span>
             <span class="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('favorites')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('favorites')">
             <span class="material-symbols-outlined text-[22px]">favorite</span>
             <span class="font-headline text-sm font-medium">已收藏</span>
           </a>
         </div>
         <div class="mt-auto border-t border-slate-100 pt-6 space-y-1">
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" href="#">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            href="#">
             <span class="material-symbols-outlined text-[22px]">settings</span>
             <span class="font-headline text-sm font-medium">设置</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" href="#">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            href="#">
             <span class="material-symbols-outlined text-[22px]">help</span>
             <span class="font-headline text-sm font-medium">帮助中心</span>
           </a>
@@ -1023,11 +1215,13 @@
           <div class="relative z-10">
             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">会员计划</p>
             <h4 class="font-headline font-bold text-sm mb-3">升级至高级会员</h4>
-            <button class="bg-white text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">
+            <button
+              class="bg-white text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">
               立即升级
             </button>
           </div>
-          <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-8xl transition-transform group-hover:scale-110">stars</span>
+          <span
+            class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-8xl transition-transform group-hover:scale-110">stars</span>
         </div>
       </aside>
       <div class="flex-1 pb-12">
@@ -1037,10 +1231,14 @@
         </header>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- 匹配宠物卡片 1 -->
-          <div class="group cursor-pointer bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all" onclick="showPage('detail')">
+          <div
+            class="group cursor-pointer bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all"
+            onclick="showPage('detail')">
             <div class="aspect-[4/3] overflow-hidden relative">
-              <img alt="Pet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=400"/>
-              <span class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">98% 匹配</span>
+              <img alt="Pet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=800" />
+              <span class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">98%
+                匹配</span>
             </div>
             <div class="p-5">
               <h3 class="font-headline font-bold text-lg text-slate-900 mb-1">哈利</h3>
@@ -1052,10 +1250,14 @@
             </div>
           </div>
           <!-- 匹配宠物卡片 2 -->
-          <div class="group cursor-pointer bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all" onclick="showPage('detail')">
+          <div
+            class="group cursor-pointer bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all"
+            onclick="showPage('detail')">
             <div class="aspect-[4/3] overflow-hidden relative">
-              <img alt="Pet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400"/>
-              <span class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">92% 匹配</span>
+              <img alt="Pet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800" />
+              <span class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">92%
+                匹配</span>
             </div>
             <div class="p-5">
               <h3 class="font-headline font-bold text-lg text-slate-900 mb-1">露西</h3>
@@ -1067,10 +1269,14 @@
             </div>
           </div>
           <!-- 匹配宠物卡片 3 -->
-          <div class="group cursor-pointer bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all" onclick="showPage('detail')">
+          <div
+            class="group cursor-pointer bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-lg transition-all"
+            onclick="showPage('detail')">
             <div class="aspect-[4/3] overflow-hidden relative">
-              <img alt="Pet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400"/>
-              <span class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">88% 匹配</span>
+              <img alt="Pet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=800" />
+              <span class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">88%
+                匹配</span>
             </div>
             <div class="p-5">
               <h3 class="font-headline font-bold text-lg text-slate-900 mb-1">雪球</h3>
@@ -1087,34 +1293,41 @@
   </main>
 
   <!-- PAGE: 消息 -->
-  <main id="page-messages" class="page">
+  <main id="page-messages" class="page pt-16">
     <div class="flex flex-1 pt-8 px-6 max-w-7xl mx-auto w-full gap-8">
       <aside class="hidden lg:flex flex-col w-64 h-[calc(100vh-120px)] sticky top-24 gap-2">
         <div class="space-y-1">
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('my')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('my')">
             <span class="material-symbols-outlined text-[22px]">dashboard</span>
             <span class="font-headline text-sm font-medium">概览</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('match')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('match')">
             <span class="material-symbols-outlined text-[22px]">pets</span>
             <span class="font-headline text-sm font-medium">匹配</span>
           </a>
-          <a class="bg-primary/5 text-primary rounded-xl px-4 py-3 flex items-center gap-4 transition-all cursor-pointer" onclick="showPage('messages')">
-            <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+          <a class="bg-primary/5 text-primary rounded-xl px-4 py-3 flex items-center gap-4 transition-all cursor-pointer"
+            onclick="showPage('messages')">
+            <span class="material-symbols-outlined text-[22px]"
+              style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
             <span class="font-headline text-sm font-semibold">消息</span>
             <span class="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('favorites')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('favorites')">
             <span class="material-symbols-outlined text-[22px]">favorite</span>
             <span class="font-headline text-sm font-medium">已收藏</span>
           </a>
         </div>
         <div class="mt-auto border-t border-slate-100 pt-6 space-y-1">
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" href="#">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            href="#">
             <span class="material-symbols-outlined text-[22px]">settings</span>
             <span class="font-headline text-sm font-medium">设置</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" href="#">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            href="#">
             <span class="material-symbols-outlined text-[22px]">help</span>
             <span class="font-headline text-sm font-medium">帮助中心</span>
           </a>
@@ -1123,11 +1336,13 @@
           <div class="relative z-10">
             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">会员计划</p>
             <h4 class="font-headline font-bold text-sm mb-3">升级至高级会员</h4>
-            <button class="bg-white text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">
+            <button
+              class="bg-white text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">
               立即升级
             </button>
           </div>
-          <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-8xl transition-transform group-hover:scale-110">stars</span>
+          <span
+            class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-8xl transition-transform group-hover:scale-110">stars</span>
         </div>
       </aside>
       <div class="flex-1 pb-12">
@@ -1137,7 +1352,8 @@
         </header>
         <div class="space-y-4">
           <!-- 消息卡片 1 -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
+          <div
+            class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
             <div class="flex items-start gap-4">
               <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                 <span class="material-symbols-outlined text-blue-600">home</span>
@@ -1155,7 +1371,8 @@
             </div>
           </div>
           <!-- 消息卡片 2 -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
+          <div
+            class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
             <div class="flex items-start gap-4">
               <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                 <span class="material-symbols-outlined text-green-600">pets</span>
@@ -1173,7 +1390,8 @@
             </div>
           </div>
           <!-- 消息卡片 3 -->
-          <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
+          <div
+            class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
             <div class="flex items-start gap-4">
               <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
                 <span class="material-symbols-outlined text-purple-600">volunteer_activism</span>
@@ -1196,34 +1414,41 @@
   </main>
 
   <!-- PAGE: 已收藏 -->
-  <main id="page-favorites" class="page">
+  <main id="page-favorites" class="page pt-16">
     <div class="flex flex-1 pt-8 px-6 max-w-7xl mx-auto w-full gap-8">
       <aside class="hidden lg:flex flex-col w-64 h-[calc(100vh-120px)] sticky top-24 gap-2">
         <div class="space-y-1">
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('my')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('my')">
             <span class="material-symbols-outlined text-[22px]">dashboard</span>
             <span class="font-headline text-sm font-medium">概览</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('match')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('match')">
             <span class="material-symbols-outlined text-[22px]">pets</span>
             <span class="font-headline text-sm font-medium">匹配</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" onclick="showPage('messages')">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            onclick="showPage('messages')">
             <span class="material-symbols-outlined text-[22px]">chat_bubble</span>
             <span class="font-headline text-sm font-medium">消息</span>
             <span class="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
           </a>
-          <a class="bg-primary/5 text-primary rounded-xl px-4 py-3 flex items-center gap-4 transition-all cursor-pointer" onclick="showPage('favorites')">
-            <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+          <a class="bg-primary/5 text-primary rounded-xl px-4 py-3 flex items-center gap-4 transition-all cursor-pointer"
+            onclick="showPage('favorites')">
+            <span class="material-symbols-outlined text-[22px]"
+              style="font-variation-settings: 'FILL' 1;">favorite</span>
             <span class="font-headline text-sm font-semibold">已收藏</span>
           </a>
         </div>
         <div class="mt-auto border-t border-slate-100 pt-6 space-y-1">
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" href="#">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            href="#">
             <span class="material-symbols-outlined text-[22px]">settings</span>
             <span class="font-headline text-sm font-medium">设置</span>
           </a>
-          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer" href="#">
+          <a class="text-slate-500 px-4 py-3 flex items-center gap-4 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            href="#">
             <span class="material-symbols-outlined text-[22px]">help</span>
             <span class="font-headline text-sm font-medium">帮助中心</span>
           </a>
@@ -1232,11 +1457,13 @@
           <div class="relative z-10">
             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">会员计划</p>
             <h4 class="font-headline font-bold text-sm mb-3">升级至高级会员</h4>
-            <button class="bg-white text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">
+            <button
+              class="bg-white text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">
               立即升级
             </button>
           </div>
-          <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-8xl transition-transform group-hover:scale-110">stars</span>
+          <span
+            class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-8xl transition-transform group-hover:scale-110">stars</span>
         </div>
       </aside>
       <div class="flex-1 pb-12">
@@ -1304,11 +1531,203 @@
     let currentApplyStep = 1;
     const API_BASE = 'http://localhost:9000/api';
 
+    // Pagination state
+    let currentPage = 0;
+    const pageSize = 12;
+    let allPets = [];
+    let hasMore = true;
+    let allLoaded = false; // 是否已加载完所有数据
+    let displayedCount = 6; // 当前显示的宠物数量
+    let currentCategory = 'all'; // 当前选中的分类
+    let currentSpecies = ''; // 当前选中的物种
+    let currentAge = ''; // 当前选中的年龄
+    let currentBreed = ''; // 当前选中的品种
+
+    // 按物种过滤
+    function filterBySpecies(species) {
+      currentSpecies = species;
+      const speciesText = document.getElementById('species-text');
+      const speciesMap = { 'dog': '狗狗', 'cat': '猫咪', 'rabbit': '兔子' };
+      speciesText.textContent = speciesMap[species] || '宠物类型';
+      loadBrowsePets();
+    }
+
+    // 按年龄过滤
+    function filterByAge(age) {
+      currentAge = age;
+      const ageText = document.getElementById('age-text');
+      const ageMap = { 'puppy': '幼年', 'adult': '成年', 'senior': '老年' };
+      ageText.textContent = ageMap[age] || '年龄范围';
+      loadBrowsePets();
+    }
+
+    // 按品种过滤
+    function filterByBreed(breed) {
+      currentBreed = breed;
+      const breedText = document.getElementById('breed-text');
+      const breedMap = { 'Golden Retriever': '金毛', 'Persian': '波斯猫', 'Labrador': '拉布拉多' };
+      breedText.textContent = breedMap[breed] || '品种';
+      loadBrowsePets();
+    }
+    let expandedCount = 0; // 展开时显示的宠物数量（一半）
+
+    // Toggle expand/collapse
+    function togglePets() {
+      if (allLoaded) {
+        // 已加载完所有数据，切换展开/收起
+        if (displayedCount <= 6) {
+          // 当前是收起状态 -> 展开显示所有已加载的宠物
+          displayedCount = allPets.length;
+        } else {
+          // 当前是展开状态 -> 收起显示6个
+          displayedCount = 6;
+        }
+        renderBrowsePets();
+        updateToggleButton();
+        return;
+      }
+      // 还没有加载完所有数据，点击加载更多
+      loadMorePets();
+    }
+
+    function updateToggleButton() {
+      const btnContainer = document.getElementById('toggle-btn-container');
+      if (!btnContainer) return;
+
+      console.log('updateToggleButton - hasMore:', hasMore, 'allLoaded:', allLoaded, 'displayedCount:', displayedCount, 'allPets.length:', allPets.length);
+
+      if (allLoaded) {
+        // 已加载完所有数据
+        if (displayedCount > 6) {
+          // 当前是展开状态（显示全部）- 显示"已全部加载完毕" + "收起"按钮
+          btnContainer.innerHTML = `
+            <div class="flex flex-col items-center gap-4">
+              <p class="text-gray-400 font-headline">已全部加载完毕</p>
+              <button class="group flex items-center gap-4 bg-surface-container-lowest border-2 border-primary/10 px-10 py-4 rounded-full font-headline font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm cursor-pointer" onclick="togglePets()">
+                <span>收起</span>
+                <span class="material-symbols-outlined group-hover:-translate-y-1 transition-transform" data-icon="expand_less">expand_less</span>
+              </button>
+            </div>`;
+        } else {
+          // 当前是收起状态（显示6个）- 不需要按钮，数据已全部加载
+          btnContainer.innerHTML = '<p class="text-gray-400 font-headline">已全部加载完毕</p>';
+        }
+      } else if (!hasMore) {
+        // 没有更多数据
+        btnContainer.innerHTML = '<p class="text-gray-400 font-headline">已全部加载完毕</p>';
+      } else {
+        // 还有更多数据需要加载
+        btnContainer.innerHTML = `<button class="group flex items-center gap-4 bg-surface-container-lowest border-2 border-primary/10 px-10 py-4 rounded-full font-headline font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm cursor-pointer" onclick="togglePets()">
+          <span>加载更多伙伴</span>
+          <span class="material-symbols-outlined group-hover:translate-y-1 transition-transform" data-icon="expand_more">expand_more</span>
+        </button>`;
+      }
+    }
+
+    // Helper: species translation
+    function getSpeciesChinese(species) {
+      const map = { 'dog': '狗', 'cat': '猫', 'rabbit': '兔', 'bird': '鸟', 'fish': '鱼', 'hamster': '仓鼠' };
+      return map[species] || species;
+    }
+
+    // Helper: age translation
+    function getAgeChinese(age) {
+      const map = { 'puppy': '幼年', 'adult': '成年', 'senior': '老年', 'kitten': '幼猫', 'young': '年轻' };
+      return map[age] || age;
+    }
+
+    // Helper: breed translation
+    function getBreedChinese(breed) {
+      const map = {
+        'Golden Retriever': '金毛寻回犬',
+        'Persian': '波斯猫',
+        'Labrador': '拉布拉多',
+        'Siamese': '暹罗猫',
+        'Border Collie': '边境牧羊犬',
+        'Holland Lop': '荷兰垂耳兔',
+        'German Shepherd': '德国牧羊犬',
+        'British Shorthair': '英国短毛猫',
+        'Beagle': '比格犬',
+        'Maine Coon': '缅因猫',
+        'Poodle': '贵宾犬',
+        'Netherland Dwarf': '荷兰侏儒兔',
+        'Ragdoll': '布偶猫',
+        'French Bulldog': '法国斗牛犬',
+        'Jack Russell Terrier': '杰克罗素梗',
+        'Tabby': '虎斑猫',
+        'Great Dane': '大丹犬',
+        'Mini Rex': '迷你雷克斯兔',
+        'Black Domestic Shorthair': '黑短毛猫',
+        'Cocker Spaniel': '可卡犬',
+        'Cockatiel': '玄凤鹦鹉',
+        'Shiba Inu': '柴犬',
+        'Lionhead': '狮子头兔',
+        'Orange Tabby': '橙虎斑猫',
+        'Bernese Mountain Dog': '伯恩山犬',
+        'Clownfish': '小丑鱼',
+        'Syrian Hamster': '叙利亚仓鼠',
+        'Cavalier King Charles': '查尔斯王小猎犬',
+        'Siberian': '西伯利亚猫',
+        'Dutch Rabbit': '荷兰兔',
+        'Rottweiler': '罗威纳犬',
+        'Husky': '哈士奇',
+        'Scottish Fold': '苏格兰折耳猫',
+        'Corgi': '柯基',
+        'Bengal': '孟加拉猫',
+        'Flemish Giant': '佛兰芒巨兔',
+        'Golden Doodle': '金毛贵妇犬',
+        'Abyssinian': '阿比西尼亚猫',
+        'Chihuahua': '吉娃娃',
+        'Rex': '雷克斯兔',
+        'Maltese': '马尔济斯犬',
+        'Russian Blue': '俄罗斯蓝猫',
+        'Boxer': '拳师犬',
+        'Budgerigar': '虎皮鹦鹉',
+        'Sphynx': '斯芬克斯猫',
+        'Australian Shepherd': '澳大利亚牧羊犬',
+        'Dwarf Hamster': '侏儒仓鼠',
+        'Dalmatian': '斑点狗',
+        'Betta': '斗鱼',
+        'Exotic Shorthair': '异国短毛猫'
+      };
+      return map[breed] || breed;
+    }
+
+    // 按分类过滤宠物
+    function filterByCategory(category) {
+      currentCategory = category;
+
+      // 更新按钮样式
+      document.querySelectorAll('.category-btn').forEach((btn, index) => {
+        const categories = ['all', 'new', 'companion', 'special', 'adoptable'];
+        if (categories[index] === category) {
+          btn.className = 'category-btn bg-primary text-white px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap';
+        } else {
+          btn.className = 'category-btn bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-surface-variant transition-colors';
+        }
+      });
+
+      // 重置显示状态
+      displayedCount = 6;
+      allLoaded = false;
+      hasMore = true;
+
+      // 重新加载数据
+      loadBrowsePets();
+    }
+
     // Helper: get pet image URL from images array
     function getPetImage(pet, index = 0) {
       if (pet.images && pet.images.length > index) return pet.images[index];
       if (pet.images && pet.images.length > 0) return pet.images[0];
-      return 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400';
+      // 根据物种类型返回对应的默认图片
+      const speciesDefaults = {
+        'dog': 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800',
+        'cat': 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800',
+        'rabbit': 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800',
+        'bird': 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=800'
+      };
+      return speciesDefaults[pet.species] || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800';
     }
 
     // Helper: gender icon
@@ -1322,13 +1741,22 @@
     function renderFeaturedPets(pets) {
       const container = document.getElementById('featured-pets-container');
       if (!container) return;
+
+      // Limit to 6 pets
+      pets = pets.slice(0, 6);
+
+      if (pets.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-8">暂无推荐宠物</p>';
+        return;
+      }
+
       container.innerHTML = pets.map((pet, i) => `
         <div class="group bg-surface-container-lowest rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer" onclick="showPage('detail', ${pet.id})">
           <div class="relative h-80 overflow-hidden">
             <img alt="${pet.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               src="${getPetImage(pet)}" />
             <div class="absolute top-4 left-4 backdrop-blur-md bg-surface-bright/70 py-1 px-4 rounded-full text-sm font-bold font-headline">
-              ${pet.age || ''} - ${pet.species || ''}
+              ${getAgeChinese(pet.age) || ''} - ${getSpeciesChinese(pet.species) || ''}
             </div>
           </div>
           <div class="p-8">
@@ -1346,10 +1774,20 @@
     }
 
     // Render browse pets (browse page)
-    function renderBrowsePets(pets) {
+    function renderBrowsePets() {
       const container = document.getElementById('browse-pets-container');
       if (!container) return;
-      container.innerHTML = pets.map(pet => `
+
+      // 按分类过滤宠物
+      let filteredPets = allPets;
+      if (currentCategory !== 'all') {
+        filteredPets = allPets.filter(pet => pet.category === currentCategory);
+      }
+
+      // 根据 displayedCount 显示宠物
+      const displayPets = filteredPets.slice(0, displayedCount);
+
+      container.innerHTML = displayPets.map(pet => `
         <div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col cursor-pointer" onclick="showPage('detail', ${pet.id})">
           <div class="relative aspect-[4/5] overflow-hidden">
             <img alt="${pet.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
@@ -1365,9 +1803,9 @@
             <div class="flex justify-between items-start mb-4">
               <div>
                 <h3 class="font-headline text-2xl font-bold text-on-surface">${pet.name}</h3>
-                <p class="text-on-surface-variant text-sm font-medium">${pet.breed || ''} - ${pet.gender === 'male' ? '公' : pet.gender === 'female' ? '母' : ''}</p>
+                <p class="text-on-surface-variant text-sm font-medium">${getBreedChinese(pet.breed) || ''} - ${getSpeciesChinese(pet.species) || ''} - ${pet.gender === 'male' ? '公' : pet.gender === 'female' ? '母' : ''}</p>
               </div>
-              <span class="bg-surface-container-low px-3 py-1 rounded-full text-xs font-bold text-outline uppercase tracking-wider">${pet.age || ''}</span>
+              <span class="bg-surface-container-low px-3 py-1 rounded-full text-xs font-bold text-outline uppercase tracking-wider">${getAgeChinese(pet.age) || ''}</span>
             </div>
             <p class="text-on-surface-variant text-sm leading-relaxed mb-6 line-clamp-2">${pet.description || ''}</p>
             <div class="mt-auto">
@@ -1393,14 +1831,14 @@
       if (nameEl) nameEl.textContent = pet.name || '';
       // Age badge
       const ageEl = document.getElementById('detail-age-badge');
-      if (ageEl) ageEl.textContent = (pet.age || '') + ' 岁';
+      if (ageEl) ageEl.textContent = getAgeChinese(pet.age) + '岁';
       // Info chips
       const breedEl = document.getElementById('detail-breed');
-      if (breedEl) breedEl.textContent = pet.breed || '';
+      if (breedEl) breedEl.textContent = getBreedChinese(pet.breed) || '';
       const genderEl = document.getElementById('detail-gender');
       if (genderEl) genderEl.textContent = pet.gender === 'male' ? '雄性' : pet.gender === 'female' ? '雌性' : '';
       const weightEl = document.getElementById('detail-weight');
-      if (weightEl && pet.weight) weightEl.textContent = pet.weight + ' kg';
+      if (weightEl && pet.weight) weightEl.textContent = pet.weight + ' 公斤';
       // Description
       const descEl = document.getElementById('detail-description');
       if (descEl) descEl.textContent = pet.description || '';
@@ -1420,7 +1858,7 @@
               src="${getPetImage(pet)}" />
           </div>
           <h4 class="font-bold text-xl">${pet.name}</h4>
-          <p class="text-on-surface-variant text-sm">${pet.age || ''} - ${pet.breed || ''}</p>
+          <p class="text-on-surface-variant text-sm">${getAgeChinese(pet.age) || ''} - ${getBreedChinese(pet.breed) || ''}</p>
         </div>
       `).join('');
     }
@@ -1444,19 +1882,82 @@
         }
       } catch (e) {
         console.error('Failed to load featured pets:', e);
+        const container = document.getElementById('featured-pets-container');
+        if (container) container.innerHTML = '<p class="text-center text-red-500 py-8">加载失败，请刷新页面</p>';
       }
     }
 
-    // Load browse pets
+    // Load browse pets (with pagination)
     async function loadBrowsePets() {
       try {
-        const res = await fetch(API_BASE + '/pets?size=12');
+        currentPage = 0;
+        allLoaded = false;
+        displayedCount = 6; // 初始显示6个
+        // 构建查询参数
+        let params = new URLSearchParams();
+        params.append('page', currentPage);
+        params.append('size', pageSize);
+        if (currentCategory !== 'all') params.append('category', currentCategory);
+        if (currentSpecies) params.append('species', currentSpecies);
+        if (currentAge) params.append('age', currentAge);
+        if (currentBreed) params.append('breed', currentBreed);
+
+        const res = await fetch(API_BASE + '/pets?' + params.toString());
         if (!res.ok) throw new Error('Network response was not ok');
         const json = await res.json();
-        const pets = json.data?.content || [];
-        renderBrowsePets(pets);
+        allPets = json.data?.content || [];
+        hasMore = json.data.currentPage < json.data.totalPages - 1;
+        console.log('loadBrowsePets - currentPage:', json.data.currentPage, 'totalPages:', json.data.totalPages, 'hasMore:', hasMore);
+        renderBrowsePets();
+        updateToggleButton();
       } catch (e) {
         console.error('Failed to load browse pets:', e);
+      }
+    }
+
+    // Load more pets - 一次性加载所有剩余页面
+    async function loadMorePets() {
+      if (!hasMore) return;
+
+      // 显示加载中状态
+      const btnContainer = document.getElementById('toggle-btn-container');
+      if (btnContainer) {
+        btnContainer.innerHTML = `<button class="bg-surface-container-lowest border-2 border-primary/10 px-10 py-4 rounded-full font-headline font-bold text-primary flex items-center gap-4 cursor-wait">
+          <span class="animate-spin material-symbols-outlined">sync</span>
+          <span>加载中...</span>
+        </button>`;
+      }
+
+      try {
+        // 一次性加载所有剩余页面
+        while (hasMore) {
+          currentPage++;
+          let params = new URLSearchParams();
+          params.append('page', currentPage);
+          params.append('size', pageSize);
+          if (currentCategory !== 'all') params.append('category', currentCategory);
+          if (currentSpecies) params.append('species', currentSpecies);
+          if (currentAge) params.append('age', currentAge);
+          if (currentBreed) params.append('breed', currentBreed);
+
+          const res = await fetch(API_BASE + '/pets?' + params.toString());
+          if (!res.ok) throw new Error('Network response was not ok');
+          const json = await res.json();
+          const newPets = json.data?.content || [];
+          allPets = allPets.concat(newPets);
+          hasMore = json.data.currentPage < json.data.totalPages - 1;
+          console.log('loadMorePets - loading page', currentPage, 'got', newPets.length, 'pets, hasMore:', hasMore);
+        }
+        // 全部加载完成
+        allLoaded = true;
+        console.log('All loaded, total pets:', allPets.length);
+        displayedCount = allPets.length;
+        renderBrowsePets();
+        updateToggleButton();
+      } catch (e) {
+        console.error('Failed to load more pets:', e);
+        currentPage--;
+        updateToggleButton();
       }
     }
 
@@ -1512,7 +2013,7 @@
           </div>
           <div class="p-5">
             <h3 class="font-headline font-bold text-lg text-slate-900 mb-1">${pet.name}</h3>
-            <p class="text-sm text-slate-500 mb-3">${pet.age || ''} • ${pet.breed || ''}</p>
+            <p class="text-sm text-slate-500 mb-3">${getAgeChinese(pet.age) || ''} • ${getBreedChinese(pet.breed) || ''}</p>
             <button class="w-full py-2.5 bg-primary text-white rounded-xl font-headline font-semibold hover:bg-primary/90 transition-colors">
               申请领养
             </button>
@@ -1666,6 +2167,74 @@
       submitBtn.innerHTML = '<span class="material-symbols-outlined">check</span> 提交申请';
     }
 
+    // Publish Pet Functions
+    function checkPublishAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('请先登录后再发布领养');
+        showLoginModal();
+        showPage('home');
+        return;
+      }
+    }
+
+    async function handlePublish() {
+      const name = document.getElementById('publish-name').value.trim();
+      const species = document.getElementById('publish-species').value;
+      const breed = document.getElementById('publish-breed').value.trim();
+      const gender = document.getElementById('publish-gender').value;
+      const age = document.getElementById('publish-age').value;
+      const weight = parseFloat(document.getElementById('publish-weight').value);
+      const description = document.getElementById('publish-description').value.trim();
+      const temperament = document.getElementById('publish-temperament').value.trim();
+
+      if (!name || !breed || !description) {
+        alert('请填写完整信息');
+        return;
+      }
+
+      const ageDetailMap = { kitten: '6个月', young: '1岁', adult: '3岁', senior: '8岁' };
+
+      const data = {
+        name,
+        species,
+        breed,
+        gender,
+        age,
+        ageDetail: ageDetailMap[age] || '1岁',
+        weight,
+        description,
+        temperament,
+        status: 'available',
+        category: 'new'
+      };
+
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(API_BASE + '/pets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(data)
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          alert('发布成功！');
+          document.getElementById('publish-name').value = '';
+          document.getElementById('publish-breed').value = '';
+          document.getElementById('publish-weight').value = '';
+          document.getElementById('publish-description').value = '';
+          document.getElementById('publish-temperament').value = '';
+        } else {
+          alert(json.message || '发布失败');
+        }
+      } catch (e) {
+        alert('发布失败，请稍后重试');
+      }
+    }
+
     async function loadApplyPet(petId) {
       if (!petId) return;
       applyPetId = petId;
@@ -1688,8 +2257,8 @@
         const tagsEl = document.getElementById('apply-pet-tags');
         if (tagsEl) {
           tagsEl.innerHTML = [
-            `<span class="bg-surface-container-highest px-3 py-1 rounded-full text-xs font-bold text-on-surface-variant">${pet.age || '--'}</span>`,
-            `<span class="bg-surface-container-highest px-3 py-1 rounded-full text-xs font-bold text-on-surface-variant">${pet.breed || '--'}</span>`
+            `<span class="bg-surface-container-highest px-3 py-1 rounded-full text-xs font-bold text-on-surface-variant">${getAgeChinese(pet.age) || '--'}</span>`,
+            `<span class="bg-surface-container-highest px-3 py-1 rounded-full text-xs font-bold text-on-surface-variant">${getBreedChinese(pet.breed) || '--'}</span>`
           ].join('');
         }
       } catch (e) {
@@ -1713,7 +2282,7 @@
       container.innerHTML = applications.map((app, i) => `
         <div class="flex items-center gap-4 ${i > 0 ? 'opacity-60' : ''}">
           <div class="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100">
-            <img alt="${app.petName || 'Pet'}" class="w-full h-full object-cover" src="${app.petImage || 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=200'}" />
+            <img alt="${app.petName || 'Pet'}" class="w-full h-full object-cover" src="${app.petImage || 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=800'}" />
           </div>
           <div class="flex-1">
             <div class="flex justify-between items-end mb-2">
@@ -1771,18 +2340,237 @@
         if (petId) {
           loadApplyPet(petId);
         }
+      } else if (pageId === 'publish') {
+        checkPublishAuth();
       } else if (pageId === 'my') {
         loadMyPageApplications();
       }
     }
 
     // Initial load on page ready
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       loadFeaturedPets();
       loadBrowsePets();
       loadMyPageApplications();
+      checkLoginStatus();
     });
+
+    // Login/Register Modal Functions
+    function showLoginModal() {
+      document.getElementById('login-modal').classList.remove('hidden');
+      document.getElementById('login-form').classList.remove('hidden');
+      document.getElementById('register-form').classList.add('hidden');
+    }
+
+    function hideLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+      document.getElementById('register-username').value = '';
+      document.getElementById('register-email').value = '';
+      document.getElementById('register-phone').value = '';
+      document.getElementById('register-password').value = '';
+      document.getElementById('register-confirm').value = '';
+    }
+
+    function showRegisterForm() {
+      document.getElementById('login-form').classList.add('hidden');
+      document.getElementById('register-form').classList.remove('hidden');
+    }
+
+    function showLoginForm() {
+      document.getElementById('register-form').classList.add('hidden');
+      document.getElementById('login-form').classList.remove('hidden');
+    }
+
+    async function handleLogin() {
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!username || !password) {
+        alert('请输入用户名和密码');
+        return;
+      }
+
+      try {
+        const res = await fetch(API_BASE + '/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const json = await res.json();
+        if (json.token) {
+          const user = { id: json.userId, username: json.username, email: json.email, avatarUrl: json.avatarUrl };
+          localStorage.setItem('token', json.token);
+          localStorage.setItem('user', JSON.stringify(user));
+          hideLoginModal();
+          updateNavUserSection(user);
+        } else {
+          alert(json.message || '登录失败');
+        }
+      } catch (e) {
+        alert('登录失败，请稍后重试');
+      }
+    }
+
+    async function handleRegister() {
+      const username = document.getElementById('register-username').value.trim();
+      const email = document.getElementById('register-email').value.trim();
+      const phone = document.getElementById('register-phone').value.trim();
+      const password = document.getElementById('register-password').value;
+      const confirm = document.getElementById('register-confirm').value;
+
+      if (!username || !password) {
+        alert('请输入用户名和密码');
+        return;
+      }
+
+      if (password !== confirm) {
+        alert('两次密码输入不一致');
+        return;
+      }
+
+      if (password.length < 6) {
+        alert('密码长度至少6位');
+        return;
+      }
+
+      const contact = email || phone;
+      if (!contact) {
+        alert('请输入邮箱或手机号');
+        return;
+      }
+
+      try {
+        const res = await fetch(API_BASE + '/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, email, phone })
+        });
+        const json = await res.json();
+        if (json.token) {
+          alert('注册成功，请登录');
+          showLoginForm();
+        } else {
+          alert(json.message || '注册失败');
+        }
+      } catch (e) {
+        alert('注册失败，请稍后重试');
+      }
+    }
+
+    function checkLoginStatus() {
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      if (token && userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          updateNavUserSection(user);
+        } catch (e) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      }
+    }
+
+    function updateNavUserSection(user) {
+      document.getElementById('nav-login-btn').classList.add('hidden');
+      document.getElementById('nav-user-section').classList.remove('hidden');
+      document.getElementById('user-avatar').textContent = user.username.charAt(0).toUpperCase();
+      document.getElementById('user-name').textContent = user.username;
+    }
+
+    function toggleUserMenu() {
+      const dropdown = document.getElementById('user-dropdown');
+      dropdown.classList.toggle('hidden');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      document.getElementById('nav-login-btn').classList.remove('hidden');
+      document.getElementById('nav-user-section').classList.add('hidden');
+      document.getElementById('user-dropdown').classList.add('hidden');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('user-dropdown');
+      const userSection = document.getElementById('nav-user-section');
+      if (dropdown && !dropdown.contains(e.target) && !userSection.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // API request with auth token
+    function authFetch(url, options = {}) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        options.headers = {
+          ...options.headers,
+          'Authorization': 'Bearer ' + token
+        };
+      }
+      return fetch(url, options);
+    }
   </script>
+
+  <!-- Login/Register Modal -->
+  <div id="login-modal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="p-6 border-b border-outline-variant/30">
+        <h2 class="text-2xl font-bold font-headline text-center" id="modal-title">登录</h2>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-form" class="p-6">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 mb-[18px] px-3">手机号 / 邮箱</label>
+          <input type="text" id="login-username" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请输入手机号或邮箱">
+        </div>
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-slate-700 mb-[18px] px-3">密码</label>
+          <input type="password" id="login-password" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请输入密码">
+        </div>
+        <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-primary to-primary-container text-white py-3 rounded-xl font-headline font-semibold hover:opacity-90 transition-opacity">登录</button>
+        <div class="mt-4 text-center text-sm text-slate-600">
+          还没有账号？ <a onclick="showRegisterForm()" class="text-primary font-medium cursor-pointer hover:underline">立即注册</a>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-form" class="hidden p-6">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 mb-3 px-3">用户名</label>
+          <input type="text" id="register-username" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请输入用户名">
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 mb-3 px-3">邮箱</label>
+          <input type="email" id="register-email" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请输入邮箱（选填）">
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 mb-3 px-3">手机号</label>
+          <input type="tel" id="register-phone" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请输入手机号">
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 mb-3 px-3">密码</label>
+          <input type="password" id="register-password" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请输入密码（至少6位）">
+        </div>
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-slate-700 mb-3 px-3">确认密码</label>
+          <input type="password" id="register-confirm" class="w-full px-4 py-3 rounded-xl border border-outline-variant/30 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="请再次输入密码">
+        </div>
+        <button onclick="handleRegister()" class="w-full bg-gradient-to-r from-primary to-primary-container text-white py-3 rounded-xl font-headline font-semibold hover:opacity-90 transition-opacity">注册</button>
+        <div class="mt-4 text-center text-sm text-slate-600">
+          已有账号？ <a onclick="showLoginForm()" class="text-primary font-medium cursor-pointer hover:underline">立即登录</a>
+        </div>
+      </div>
+
+      <div class="px-6 pb-6">
+        <button onclick="hideLoginModal()" class="w-full py-2 text-slate-600 hover:text-slate-800 transition-colors">取消</button>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

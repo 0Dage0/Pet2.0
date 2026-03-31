@@ -41,8 +41,8 @@ public class PetService {
         return pets.map(pet -> toDTO(pet, userId));
     }
 
-    public Page<PetDTO> getPetsByFilter(String species, String breed, String gender, String age, Pageable pageable, Long userId) {
-        Page<Pet> pets = petRepository.findByFilters(species, breed, gender, age, pageable);
+    public Page<PetDTO> getPetsByFilter(String species, String breed, String gender, String age, String category, Pageable pageable, Long userId) {
+        Page<Pet> pets = petRepository.findByFilters(species, breed, gender, age, category, pageable);
         return pets.map(pet -> toDTO(pet, userId));
     }
 
@@ -57,6 +57,31 @@ public class PetService {
         return pets.stream()
                 .map(pet -> toDTO(pet, userId))
                 .collect(Collectors.toList());
+    }
+
+    public PetDTO createPet(PetDTO petDTO, Long userId) {
+        Pet pet = new Pet();
+        pet.setName(petDTO.getName());
+        pet.setSpecies(petDTO.getSpecies());
+        pet.setBreed(petDTO.getBreed());
+        pet.setGender(petDTO.getGender());
+        pet.setAge(petDTO.getAge());
+        pet.setAgeDetail(petDTO.getAgeDetail());
+        pet.setWeight(petDTO.getWeight());
+        pet.setDescription(petDTO.getDescription());
+        pet.setTemperament(petDTO.getTemperament());
+        pet.setHealthStatus("Healthy");
+        pet.setVaccinated(false);
+        pet.setNeutered(false);
+        pet.setMicrochipped(false);
+        pet.setImages("[]");
+        pet.setStatus("available");
+        pet.setIsFeatured(false);
+        pet.setCategory(petDTO.getCategory() != null ? petDTO.getCategory() : "new");
+        pet.setShelterId(1L); // Default shelter
+
+        pet = petRepository.save(pet);
+        return toDTO(pet, userId);
     }
 
     public List<PetDTO> getRecommendedPets(Long userId, String preferredSpecies) {

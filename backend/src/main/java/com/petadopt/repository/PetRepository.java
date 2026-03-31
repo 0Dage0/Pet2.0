@@ -29,11 +29,13 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
            "AND (:species IS NULL OR p.species = :species) " +
            "AND (:breed IS NULL OR p.breed LIKE %:breed%) " +
            "AND (:gender IS NULL OR p.gender = :gender) " +
-           "AND (:age IS NULL OR p.age = :age)")
+           "AND (:age IS NULL OR p.age = :age) " +
+           "AND (:category IS NULL OR p.category = :category)")
     Page<Pet> findByFilters(
             @Param("species") String species,
             @Param("breed") String breed,
             @Param("gender") String gender,
             @Param("age") String age,
+            @Param("category") String category,
             Pageable pageable);
 }

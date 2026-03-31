@@ -30,6 +30,7 @@ public class PetController {
             @RequestParam(required = false) String breed,
             @RequestParam(required = false) String gender,
             @RequestParam(required = false) String age,
+            @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -37,7 +38,7 @@ public class PetController {
         Long userId = userPrincipal != null ? userPrincipal.getId() : null;
 
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<PetDTO> pets = petService.getPetsByFilter(species, breed, gender, age, pageable, userId);
+        Page<PetDTO> pets = petService.getPetsByFilter(species, breed, gender, age, category, pageable, userId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("content", pets.getContent());
@@ -80,5 +81,16 @@ public class PetController {
     public ResponseEntity<ApiResponse> getSpeciesList() {
         List<String> species = List.of("dog", "cat", "rabbit");
         return ResponseEntity.ok(ApiResponse.success(species));
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse> createPet(
+            @RequestBody PetDTO petDTO,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("请先登录"));
+        }
+        PetDTO created = petService.createPet(petDTO, userPrincipal.getId());
+        return ResponseEntity.ok(ApiResponse.success(created));
     }
 }
