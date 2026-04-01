@@ -152,13 +152,13 @@
           onclick="showPage('about')">关于我们</a>
       </div>
       <div class="flex items-center gap-4">
-        <div id="nav-user-section" class="hidden">
+        <div id="nav-user-section" class="hidden relative">
           <div class="flex items-center gap-3 cursor-pointer" onclick="toggleUserMenu()">
             <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold" id="user-avatar">U</div>
             <span class="font-headline font-medium text-slate-700" id="user-name">用户</span>
             <span class="material-symbols-outlined text-slate-500">expand_more</span>
           </div>
-          <div id="user-dropdown" class="hidden absolute right-6 top-16 bg-white rounded-xl shadow-lg border border-outline-variant/30 py-2 min-w-40">
+          <div id="user-dropdown" class="hidden absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-outline-variant/30 py-2 min-w-40">
             <a class="block px-4 py-2 text-slate-600 hover:bg-surface-container transition-colors cursor-pointer" onclick="showPage('my')">我的资料</a>
             <a class="block px-4 py-2 text-slate-600 hover:bg-surface-container transition-colors cursor-pointer" onclick="showPage('favorites')">我的收藏</a>
             <div class="border-t border-outline-variant/30 my-1"></div>
@@ -348,10 +348,10 @@
               </button>
               <!-- 鼠标经过显示下拉 -->
               <div class="absolute top-full left-0 mt-1 bg-surface-container-low rounded-xl shadow-lg overflow-hidden z-50 min-w-32 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <button onclick="filterBySpecies('')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">全部</button>
-                <button onclick="filterBySpecies('dog')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">狗狗</button>
-                <button onclick="filterBySpecies('cat')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">猫咪</button>
-                <button onclick="filterBySpecies('rabbit')" class="block w-full text-left px-6 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">兔子</button>
+                <button onclick="filterBySpecies('')" class="block w-full text-left px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">全部</button>
+                <button onclick="filterBySpecies('dog')" class="block w-full text-left px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">狗狗</button>
+                <button onclick="filterBySpecies('cat')" class="block w-full text-left px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">猫咪</button>
+                <button onclick="filterBySpecies('rabbit')" class="block w-full text-left px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface">兔子</button>
               </div>
             </div>
             <!-- 年龄范围下拉菜单 -->
@@ -2384,11 +2384,25 @@
     }
 
     async function handleLogin() {
-      const username = document.getElementById('login-username').value.trim();
+      const loginId = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-password').value;
 
-      if (!username || !password) {
-        alert('请输入用户名和密码');
+      if (!loginId || !password) {
+        alert('请输入手机号/邮箱和密码');
+        return;
+      }
+
+      // Validate loginId: phone (1 + 10 digits) or email
+      const isPhone = /^1\d{10}$/.test(loginId);
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginId);
+      if (!isPhone && !isEmail) {
+        alert('请输入有效的手机号(1开头的11位数字)或邮箱');
+        return;
+      }
+
+      // Validate password: max 20 characters
+      if (password.length > 20) {
+        alert('密码不能超过20位');
         return;
       }
 
@@ -2396,7 +2410,7 @@
         const res = await fetch(API_BASE + '/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+          body: JSON.stringify({ username: loginId, password })
         });
         const json = await res.json();
         if (json.token) {
@@ -2430,13 +2444,20 @@
         return;
       }
 
-      if (password.length < 6) {
-        alert('密码长度至少6位');
+      // Validate password: 6-20 characters
+      if (password.length < 6 || password.length > 20) {
+        alert('密码长度需在6-20位之间');
         return;
       }
 
-      const contact = email || phone;
-      if (!contact) {
+      // Validate phone: starts with 1, exactly 11 digits (if provided)
+      if (phone && !/^1\d{10}$/.test(phone)) {
+        alert('手机号需为1开头的11位数字');
+        return;
+      }
+
+      // Validate email or phone is required
+      if (!email && !phone) {
         alert('请输入邮箱或手机号');
         return;
       }

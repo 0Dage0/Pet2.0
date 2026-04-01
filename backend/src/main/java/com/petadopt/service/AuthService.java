@@ -29,6 +29,21 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
+        if (userRepository.existsByPhone(request.getPhone())) {
+            throw new RuntimeException("Phone already exists");
+        }
+
+        // Validate phone: starts with 1, exactly 11 digits
+        if (request.getPhone() != null && !request.getPhone().isEmpty()) {
+            if (!request.getPhone().matches("^1\\d{10}$")) {
+                throw new RuntimeException("Phone number must start with 1 and be 11 digits");
+            }
+        }
+
+        // Validate password: max 20 characters
+        if (request.getPassword() != null && request.getPassword().length() > 20) {
+            throw new RuntimeException("Password must not exceed 20 characters");
+        }
 
         User user = User.builder()
                 .username(request.getUsername())
@@ -49,12 +64,17 @@ public class AuthService {
                 .build();
     }
 
-    public AuthResponse login(String username, String password) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+    public AuthResponse login(String loginId, String password) {
+        // loginId can be phone or email
+        User user = userRepository.findByPhone(loginId)
+                .orElseGet(() -> userRepository.findByEmail(loginId).orElse(null));
+
+        if (user == null) {
+            throw new RuntimeException("Invalid phone/email or password");
+        }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new RuntimeException("Invalid phone/email or password");
         }
 
         String token = jwtUtils.generateToken(user.getUsername(), user.getId());
