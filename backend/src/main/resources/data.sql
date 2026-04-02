@@ -1,6 +1,7 @@
 -- Initial test data for Pet Adoption Platform
 
--- Delete existing pets to avoid duplicates
+-- Delete in correct order to respect foreign key constraints
+DELETE FROM applications;
 DELETE FROM pets;
 
 -- Create test user (password: 123456) - only if not exists
